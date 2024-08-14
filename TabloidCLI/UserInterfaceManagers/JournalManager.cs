@@ -141,12 +141,6 @@ namespace TabloidCLI.UserInterfaceManagers
             {
                 journalToEdit.Content = content;
             }
-            Console.Write("New date/time (blank to leave unchanged: ");
-            string dateTime = Console.ReadLine();
-            if (!string.IsNullOrWhiteSpace(dateTime))
-            {
-                journalToEdit.CreateDateTime = Convert.ToDateTime(dateTime);
-            }
 
             _journalRepository.Update(journalToEdit);
         }
