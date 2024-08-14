@@ -46,7 +46,9 @@ namespace TabloidCLI.UserInterfaceManagers
             Console.WriteLine($"Title: {note.Title}");
             Console.WriteLine($"Content: {note.Content}");
             Console.WriteLine($"Date Posted: {note.CreateDateTime}");
-            Console.WriteLine($"Post Id: {note.PostId}");
+            Console.WriteLine("-------------------------------");
+            Console.WriteLine($"Post: {note.Post.Title}");
+            Console.WriteLine($"Url: {note.Post.Url}");
         }
     }
 }

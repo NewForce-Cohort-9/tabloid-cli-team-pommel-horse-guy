@@ -9,6 +9,7 @@ namespace TabloidCLI.UserInterfaceManagers
         private readonly IUserInterfaceManager _parentUI;
         private NoteRepository _noteRepository;
         private string _connectionString;
+        private int postId;
 
         public NoteManager(IUserInterfaceManager parentUI, string connectionString)
         {
@@ -69,7 +70,9 @@ namespace TabloidCLI.UserInterfaceManagers
                 Console.WriteLine($"Date: {note.CreateDateTime}");
                 Console.WriteLine($"Title: {note.Title}");
                 Console.WriteLine($"Content: {note.Content}");
-                Console.WriteLine($"Post: {note.PostId}");
+                Console.WriteLine("-------------------------------");
+                Console.WriteLine($"Post: {note.Post.Title}");
+                Console.WriteLine($"Url: {note.Post.Url}");
                 Console.WriteLine("-------------------------------");
             }
         }
@@ -119,7 +122,7 @@ namespace TabloidCLI.UserInterfaceManagers
             note.CreateDateTime = DateTime.Now;
 
             Console.Write("Post Id: ");
-            note.PostId = Convert.ToInt32(Console.ReadLine());
+            postId = Convert.ToInt32(Console.ReadLine());
 
             _noteRepository.Insert(note);
         }
@@ -145,13 +148,6 @@ namespace TabloidCLI.UserInterfaceManagers
             {
                 noteToEdit.Content = content;
             }
-            Console.Write("New post id (blank to leave unchanged: ");
-            string postId = Console.ReadLine();
-            if (!string.IsNullOrWhiteSpace(content))
-            {
-                noteToEdit.PostId = Convert.ToInt32(postId);
-            }
-
             _noteRepository.Update(noteToEdit);
         }
 
