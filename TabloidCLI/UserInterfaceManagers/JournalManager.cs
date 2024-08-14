@@ -106,7 +106,7 @@ namespace TabloidCLI.UserInterfaceManagers
 
         private void Add()
         {
-            Console.WriteLine("New Author");
+            Console.WriteLine("New Journal Entry");
             Journal journal = new Journal();
 
             Console.Write("Title: ");
@@ -115,8 +115,7 @@ namespace TabloidCLI.UserInterfaceManagers
             Console.Write("Content: ");
             journal.Content = Console.ReadLine();
 
-            Console.Write("Date Posted: ");
-            journal.CreateDateTime = Convert.ToDateTime(Console.ReadLine());
+            journal.CreateDateTime = DateTime.Now;
 
             _journalRepository.Insert(journal);
         }
