@@ -26,7 +26,7 @@ namespace TabloidCLI.UserInterfaceManagers
         {
             Console.WriteLine("Post Management");
             Console.WriteLine(" 1) List Posts");
-            Console.WriteLine(" 2) Add Post");   // Added Add Post option
+            Console.WriteLine(" 2) Add Post"); 
             Console.WriteLine(" 3) Remove Post");
             Console.WriteLine(" 4) Edit Post");
             Console.WriteLine(" 5) View Post Details");
@@ -40,7 +40,7 @@ namespace TabloidCLI.UserInterfaceManagers
                     ListPosts();
                     return this;
                 case "2":
-                    AddPost();   // Implement Add Post method here
+                    AddPost();
                     return this;
                 case "3":
                     RemovePost();
@@ -49,8 +49,7 @@ namespace TabloidCLI.UserInterfaceManagers
                     EditPost();
                     return this;
                 case "5":
-                    ViewPostDetails();
-                    return this;
+                    return ViewPostDetails();
                 case "0":
                     return _parentUI;
                 default:
@@ -167,17 +166,14 @@ namespace TabloidCLI.UserInterfaceManagers
             Console.WriteLine("Post updated successfully.");
         }
 
-        private void ViewPostDetails()
+        private IUserInterfaceMangaer ViewPostDetails()
         {
             Post post = ChoosePost("Which post would you like to view?");
             if (post != null)
             {
-                Console.WriteLine($"Title: {post.Title}");
-                Console.WriteLine($"URL: {post.Url}");
-                Console.WriteLine($"Publication Date: {post.PublishDateTime.ToShortDateString()}");
-                Console.WriteLine($"Author: {post.Author.FullName}");
-                Console.WriteLine($"Blog: {post.Blog.Title}");
+                return new PostDetailManager(this, _connectionString, post);
             }
+            return this;
         }
 
         private Post ChoosePost(string prompt)
