@@ -140,12 +140,30 @@ namespace TabloidCLI.UserInterfaceManagers
 
         private void ViewPosts()
         {
-            //TODO
-            Console.WriteLine("TODO"); 
+            Blog blog = _blogRepository.Get(_blogId);
+
+            List<Post> posts = _postRepository
+                .GetByBlog(_blogId)
+                .OrderBy(p => p.PublishDateTime)
+                .ToList(); 
+
+            if (posts.Count == 0)
+            {
+                Console.WriteLine($"No posts found for {blog.Title}");
+                    return; 
+            };
+
+            Console.WriteLine();
+            Console.WriteLine($"Showing all posts for {blog.Title}: ");
+            
+            for (int i = 0; i < posts.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}) ");
+                Console.WriteLine($"Title: {posts[i].Title}");
+                Console.WriteLine($"Published on: {posts[i].PublishDateTime}");
+                Console.WriteLine();
+            }
+
         }
-
     }
-
-    
-
 }

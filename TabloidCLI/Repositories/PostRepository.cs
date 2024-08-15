@@ -167,6 +167,39 @@ namespace TabloidCLI.Repositories
             }
         }
 
+        public List<Post> GetByBlog(int blogId)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "SELECT * FROM Post WHERE BlogId = @blogId";
+                    cmd.Parameters.AddWithValue("@blogId", blogId); 
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    List<Post> posts = [];
+                 
+                    while (reader.Read())
+                    {
+                        Post post = new()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Title = reader.GetString(reader.GetOrdinal("Title")),
+                            Url = reader.GetString(reader.GetOrdinal("Url")),
+                            PublishDateTime = reader.GetDateTime(reader.GetOrdinal("PublishDateTime"))
+                        };
+                        posts.Add(post); 
+
+                    }
+                    reader.Close();
+                    return posts; 
+                }
+
+            }
+        }
+
         public void Insert(Post post)
         {
             using (SqlConnection conn = Connection)
