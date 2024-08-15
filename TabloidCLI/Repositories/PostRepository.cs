@@ -196,7 +196,6 @@ namespace TabloidCLI.Repositories
                     reader.Close();
                     return posts; 
                 }
-
             }
         }
 
