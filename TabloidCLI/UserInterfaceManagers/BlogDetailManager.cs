@@ -38,7 +38,6 @@ namespace TabloidCLI.UserInterfaceManagers
 
             switch (choice)
             {
-
                 case "1":
                     View();
                     return this;
@@ -48,7 +47,6 @@ namespace TabloidCLI.UserInterfaceManagers
                 case "3":
                     RemoveTag();
                     return this;
-
                 case "4":
                     ViewPosts();
                     return this;
@@ -144,7 +142,7 @@ namespace TabloidCLI.UserInterfaceManagers
 
             List<Post> posts = _postRepository
                 .GetByBlog(_blogId)
-                .OrderBy(p => p.PublishDateTime)
+                .OrderByDescending(p => p.PublishDateTime)
                 .ToList(); 
 
             if (posts.Count == 0)
