@@ -34,7 +34,7 @@ namespace TabloidCLI.UserInterfaceManagers
             Console.WriteLine(" 0) Go Back");
 
             Console.Write("> ");
-            string choice = Console.ReadLine() ?? "";
+            string choice = Console.ReadLine() ?? ""; 
 
             switch (choice)
             {
@@ -43,14 +43,14 @@ namespace TabloidCLI.UserInterfaceManagers
                     View();
                     return this;
                 case "2":
-                    //AddTag()
+                    AddTag();
                     return this;
                 case "3":
-                    //RemoveTag()
+                    RemoveTag();
                     return this;
 
                 case "4":
-                    //ViewPosts();
+                    ViewPosts();
                     return this;
                 case "0":
                     return _parentUI;
@@ -63,7 +63,7 @@ namespace TabloidCLI.UserInterfaceManagers
 
         private void View()
         {
-            Blog blog = _blogRepository.Get(_blogId);
+            Blog blog = _blogRepository.GetWithBlogTags(_blogId);
             Console.WriteLine($"Title: {blog.Title}");
             Console.WriteLine($"URL: {blog.Url}");
 
@@ -71,7 +71,7 @@ namespace TabloidCLI.UserInterfaceManagers
             {
                 foreach (Tag tag in blog.Tags)
                 {
-                    Console.WriteLine(" " + tag);
+                    Console.WriteLine("Tag is: " + tag);
                 }
                 Console.WriteLine();
             }
@@ -111,7 +111,7 @@ namespace TabloidCLI.UserInterfaceManagers
 
         private void RemoveTag()
         {
-            Blog blog = _blogRepository.Get(_blogId);
+            Blog blog = _blogRepository.GetWithBlogTags(_blogId);
 
             Console.WriteLine($"Which tag would you like to remove from {blog.Title}?");
 
