@@ -34,23 +34,21 @@ namespace TabloidCLI.UserInterfaceManagers
             Console.WriteLine(" 0) Go Back");
 
             Console.Write("> ");
-            string choice = Console.ReadLine() ?? "";
+            string choice = Console.ReadLine() ?? ""; 
 
             switch (choice)
             {
-
                 case "1":
                     View();
                     return this;
                 case "2":
-                    //AddTag()
+                    AddTag();
                     return this;
                 case "3":
-                    //RemoveTag()
+                    RemoveTag();
                     return this;
-
                 case "4":
-                    //ViewPosts();
+                    ViewPosts();
                     return this;
                 case "0":
                     return _parentUI;
@@ -63,7 +61,7 @@ namespace TabloidCLI.UserInterfaceManagers
 
         private void View()
         {
-            Blog blog = _blogRepository.Get(_blogId);
+            Blog blog = _blogRepository.GetWithBlogTags(_blogId);
             Console.WriteLine($"Title: {blog.Title}");
             Console.WriteLine($"URL: {blog.Url}");
 
@@ -71,7 +69,7 @@ namespace TabloidCLI.UserInterfaceManagers
             {
                 foreach (Tag tag in blog.Tags)
                 {
-                    Console.WriteLine(" " + tag);
+                    Console.WriteLine("Tag is: " + tag);
                 }
                 Console.WriteLine();
             }
@@ -111,7 +109,7 @@ namespace TabloidCLI.UserInterfaceManagers
 
         private void RemoveTag()
         {
-            Blog blog = _blogRepository.Get(_blogId);
+            Blog blog = _blogRepository.GetWithBlogTags(_blogId);
 
             Console.WriteLine($"Which tag would you like to remove from {blog.Title}?");
 
@@ -140,12 +138,30 @@ namespace TabloidCLI.UserInterfaceManagers
 
         private void ViewPosts()
         {
-            //TODO
-            Console.WriteLine("TODO"); 
+            Blog blog = _blogRepository.Get(_blogId);
+
+            List<Post> posts = _postRepository
+                .GetByBlog(_blogId)
+                .OrderByDescending(p => p.PublishDateTime)
+                .ToList(); 
+
+            if (posts.Count == 0)
+            {
+                Console.WriteLine($"No posts found for {blog.Title}");
+                    return; 
+            };
+
+            Console.WriteLine();
+            Console.WriteLine($"Showing all posts for {blog.Title}: ");
+            
+            for (int i = 0; i < posts.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}) ");
+                Console.WriteLine($"Title: {posts[i].Title}");
+                Console.WriteLine($"Published on: {posts[i].PublishDateTime}");
+                Console.WriteLine();
+            }
+
         }
-
     }
-
-    
-
 }
