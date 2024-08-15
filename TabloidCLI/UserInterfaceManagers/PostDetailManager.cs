@@ -9,6 +9,7 @@ namespace TabloidCLI.UserInterfaceManagers
         private readonly IUserInterfaceManager _parentUI;
         private readonly Post _post;
         private readonly TagRepository _tagRepository;
+        private readonly PostTagRepository _postTagRepository;
         private readonly string _connectionString;
 
         public PostDetailManager(IUserInterfaceManager parentUI, string connectionString, Post post)
@@ -17,6 +18,7 @@ namespace TabloidCLI.UserInterfaceManagers
             _connectionString = connectionString;
             _post = post;
             _tagRepository = new TagRepository(connectionString);
+            _postTagRepository = new PostTagRepository(connectionString);
         }
 
         public IUserInterfaceManager Execute()
@@ -58,16 +60,81 @@ namespace TabloidCLI.UserInterfaceManagers
             Console.WriteLine($"Publication Date: {_post.PublishDateTime.ToShortDateString()}");
             Console.WriteLine($"Author: {_post.Author.FullName}");
             Console.WriteLine($"Blog: {_post.Blog.Title}");
+
+            List<Tag> tags = _postTagRepository.GetTagsByPostId( _post.Id );
+            if ( tags.Count > 0 )
+            {
+                Console.WriteLine("Tags:");
+                foreach ( Tag tag in tags )
+                {
+                    Console.WriteLine($" - {tag.Name}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("No tags assigned to this post");
+            }
         }
 
         private void AddTag()
         {
-            Console.WriteLine("Tagging is not yet implemented.");
+            Console.WriteLine("Select a tag to add:");
+            List<Tag> tags = _tagRepository.GetAll();
+            for (int i = 0; i < tags.Count; i++)
+            {
+                Tag tag = tags[i];
+                Console.WriteLine($" {i + 1}) {tag.Name}");
+            }
+            Console.WriteLine("> ");
+            string input = Console.ReadLine();
+
+            try
+            {
+                int choice = int.Parse(input);
+                Tag selectedTag = tags[choice - 1];
+
+                _postTagRepository.Insert(_post.Id, selectedTag.Id);
+                Console.WriteLine($"Tag '{selectedTag.Name}' added to the post.");
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Invalid selection. No tag added.");
+            }
         }
 
         private void RemoveTag()
         {
-            Console.WriteLine("Removing a tag is not yet implemented.");
+            Console.WriteLine("Select a tag to remove:");
+
+            // Display tags associated with the post
+            List<Tag> tags = _postTagRepository.GetTagsByPostId(_post.Id);
+            if (tags.Count == 0)
+            {
+                Console.WriteLine("No tags to remove.");
+                return;
+            }
+
+            for (int i = 0; i < tags.Count; i++)
+            {
+                Tag tag = tags[i];
+                Console.WriteLine($" {i + 1}) {tag.Name}");
+            }
+            Console.Write("> ");
+            string input = Console.ReadLine();
+
+            try
+            {
+                int choice = int.Parse(input);
+                Tag selectedTag = tags[choice - 1];
+
+                // Remove the tag from the post
+                _postTagRepository.Delete(_post.Id, selectedTag.Id);
+                Console.WriteLine($"Tag '{selectedTag.Name}' removed from the post.");
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Invalid selection. No tag removed.");
+            }
         }
     }
 }
