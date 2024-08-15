@@ -166,7 +166,7 @@ namespace TabloidCLI.UserInterfaceManagers
             Console.WriteLine("Post updated successfully.");
         }
 
-        private IUserInterfaceMangaer ViewPostDetails()
+        private IUserInterfaceManager ViewPostDetails()
         {
             Post post = ChoosePost("Which post would you like to view?");
             if (post != null)
