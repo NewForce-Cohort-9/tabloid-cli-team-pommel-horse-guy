@@ -1,7 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
 using TabloidCLI.Models;
-using TabloidCLI.Repositories;
-
 
 namespace TabloidCLI.Repositories
 {
@@ -58,7 +56,7 @@ namespace TabloidCLI.Repositories
                         {
                             blog = new Blog()
                             {
-                                Id = reader.GetOrdinal("Id"),
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
                                 Title = reader.GetString(reader.GetOrdinal("Title")),
                                 Url = reader.GetString(reader.GetOrdinal("URL")),
                             };
@@ -81,11 +79,11 @@ namespace TabloidCLI.Repositories
 
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT b.*, t.Id AS TagId, t.Name AS TagName, bt.Id AS BlogTagId, bt.BlogId, bt.TagId 
+                    cmd.CommandText = @"SELECT b.*, t.Name AS TagName, t.Id AS TagId
                                         FROM Blog b
-                                        JOIN BlogTag bt ON bt.Id = b.Id
-                                        JOIN Tag t ON t.Id = bt.TagId
-                                        WHERE b.Id = bt.BlogId";
+                                        LEFT JOIN BlogTag bt ON b.Id = bt.BlogId
+                                        LEFT JOIN Tag t ON bt.TagId = t.Id
+                                        WHERE b.Id = @id";
                     cmd.Parameters.AddWithValue("@id", id); 
 
                     Blog blog = null;
@@ -93,8 +91,7 @@ namespace TabloidCLI.Repositories
                     SqlDataReader reader = cmd.ExecuteReader();
                     while (reader.Read())
                     {
-
-                        if (blog == null)
+                           if (!reader.IsDBNull(reader.GetOrdinal("Id")))
                         {
                             blog = new Blog()
                             {
@@ -103,15 +100,16 @@ namespace TabloidCLI.Repositories
                                 Url = reader.GetString(reader.GetOrdinal("URL")),
 
                             };
-                        }
 
-                        if (!reader.IsDBNull(reader.GetOrdinal("TagId")))
-                        {
-                            blog.Tags.Add(new Tag()
+
+                            if (!reader.IsDBNull(reader.GetOrdinal("TagId")))
                             {
-                                Id = reader.GetInt32(reader.GetOrdinal("TagId")),
-                                Name = reader.GetString(reader.GetOrdinal("Name"))
-                            });
+                                blog.Tags.Add(new Tag()
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("TagId")),
+                                    Name = reader.GetString(reader.GetOrdinal("TagName"))
+                                });
+                            }
                         }
                     }
                     reader.Close();
@@ -138,6 +136,7 @@ namespace TabloidCLI.Repositories
                     cmd.ExecuteNonQuery();
                 }
             }
+            Console.WriteLine("Blog successfully added.");
         }
 
         public void Update(Blog blog)
@@ -158,6 +157,7 @@ namespace TabloidCLI.Repositories
                                         
                 }
             }
+            Console.WriteLine("Blog successfully updated.");
 
         }
 
@@ -176,6 +176,7 @@ namespace TabloidCLI.Repositories
                 }
 
             }
+            Console.WriteLine("Blog successfully deleted.");
         }
 
         public void InsertTag(Blog blog, Tag tag)
@@ -189,8 +190,11 @@ namespace TabloidCLI.Repositories
                                         VALUES (@blogId, @tagId)";
                     cmd.Parameters.AddWithValue("@blogId", blog.Id);
                     cmd.Parameters.AddWithValue("@tagId", tag.Id);
+
+                    cmd.ExecuteNonQuery();
                 }
             }
+            Console.WriteLine("Blog tag inserted successfully.");
         }
 
         public void DeleteTag(int blogId, int tagId)
@@ -209,6 +213,7 @@ namespace TabloidCLI.Repositories
                     cmd.ExecuteNonQuery(); 
                 }
             }
+            Console.WriteLine("Blog tag removed.");
         }
 
     }

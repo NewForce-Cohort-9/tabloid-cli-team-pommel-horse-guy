@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿
 namespace TabloidCLI.UserInterfaceManagers
 {
     public class MainMenuManager : IUserInterfaceManager
