@@ -9,7 +9,7 @@ namespace TabloidCLI.UserInterfaceManagers
 
         public IUserInterfaceManager Execute()
         {
-            Console.WriteLine("Welcome to your Organizer");
+            Console.WriteLine("Welcome to your Organizer!");
             Console.WriteLine("Main Menu");
 
             Console.WriteLine(" 1) Journal Management");
