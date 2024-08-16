@@ -247,5 +247,83 @@ namespace TabloidCLI
         }
 
 
+
+        public SearchResults<object> SearchAll(string tagName)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                SELECT 'Blog' AS Type, b.Id AS Id, b.Title AS Title, NULL AS FirstName, NULL AS LastName
+                FROM Blog b
+                LEFT JOIN BlogTag bt ON b.Id = bt.BlogId
+                LEFT JOIN Tag t ON t.Id = bt.TagId
+                WHERE t.Name LIKE @name
+
+                UNION ALL
+
+                SELECT 'Author' AS Type, a.Id AS Id, NULL AS Title, a.FirstName AS FirstName, a.LastName AS LastName
+                FROM Author a
+                LEFT JOIN AuthorTag at ON a.Id = at.AuthorId
+                LEFT JOIN Tag t ON t.Id = at.TagId
+                WHERE t.Name LIKE @name
+
+                UNION ALL
+
+                SELECT 'Post' AS Type, p.Id AS Id, p.Title AS Title, NULL AS FirstName, NULL AS LastName
+                FROM Post p
+                LEFT JOIN PostTag pt ON p.Id = pt.PostId
+                LEFT JOIN Tag t ON t.Id = pt.TagId
+                WHERE t.Name LIKE @name";
+
+                    cmd.Parameters.AddWithValue("@name", $"%{tagName}%");
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    SearchResults<object> results = new SearchResults<object>();
+                    while (reader.Read())
+                    {
+                        string type = reader.GetString(reader.GetOrdinal("Type"));
+                        int id = reader.GetInt32(reader.GetOrdinal("Id"));
+                        string title = reader.IsDBNull(reader.GetOrdinal("Title")) ? null : reader.GetString(reader.GetOrdinal("Title"));
+                        string firstName = reader.IsDBNull(reader.GetOrdinal("FirstName")) ? null : reader.GetString(reader.GetOrdinal("FirstName"));
+                        string lastName = reader.IsDBNull(reader.GetOrdinal("LastName")) ? null : reader.GetString(reader.GetOrdinal("LastName"));
+
+                        if (type == "Blog")
+                        {
+                            results.Add(new Blog
+                            {
+                                Id = id,
+                                Title = title
+                            });
+                        }
+                        else if (type == "Author")
+                        {
+                            results.Add(new Author
+                            {
+                                Id = id,
+                                FirstName = firstName,
+                                LastName = lastName
+                            });
+                        }
+                        else if (type == "Post")
+                        {
+                            results.Add(new Post
+                            {
+                                Id = id,
+                                Title = title
+                            });
+                        }
+                    }
+
+                    reader.Close();
+
+                    return results;
+                }
+            }
+        }
+
+
     }
 }
