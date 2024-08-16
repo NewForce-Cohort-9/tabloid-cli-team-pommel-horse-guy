@@ -195,6 +195,59 @@ namespace TabloidCLI
             }
         }
 
+        public SearchResults<Post> SearchPosts(string tagName)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT p.Id,
+                                       p.Title,
+                                       p.URL,
+                                       p.PublishDateTime,
+                                       a.FirstName,
+                                       a.LastName,
+                                       b.Title AS BlogTitle
+                                  FROM Post p
+                                  JOIN PostTag pt ON pt.PostId = p.Id
+                                  JOIN Tag t ON t.Id = pt.TagId
+                                  LEFT JOIN Author a ON p.AuthorId = a.Id
+                                  LEFT JOIN Blog b ON p.BlogId = b.Id
+                                 WHERE t.Name LIKE @name";
+                    cmd.Parameters.AddWithValue("@name", $"%{tagName}%");
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    SearchResults<Post> results = new SearchResults<Post> { Title = $"Posts tagged with '{tagName}'" };
+                    while (reader.Read())
+                    {
+                        Post post = new Post()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Title = reader.GetString(reader.GetOrdinal("Title")),
+                            Url = reader.GetString(reader.GetOrdinal("URL")),
+                            PublishDateTime = reader.GetDateTime(reader.GetOrdinal("PublishDateTime")),
+                            Author = new Author()
+                            {
+                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                LastName = reader.GetString(reader.GetOrdinal("LastName"))
+                            },
+                            Blog = new Blog()
+                            {
+                                Title = reader.GetString(reader.GetOrdinal("BlogTitle"))
+                            }
+                        };
+                        results.Add(post);
+                    }
+                    reader.Close();
+                    return results;
+                }
+            }
+        }
+
+
+
         public SearchResults<object> SearchAll(string tagName)
         {
             using (SqlConnection conn = Connection)
